@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (
+        request.auth.token.email_verified == true ||
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+
+    function isVerifiedOwner(userId) {
+      return isOwner(userId) && isVerifiedUser();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow get: if isSignedIn();
+    }
+
+    // User profile and subcollections: Strict isolation with verified ownership
+    match /users/{userId} {
+      // Authenticated and verified user can read and manage only their own profile
+      allow get: if isVerifiedOwner(userId);
+      allow create, update: if isVerifiedOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.name is string && request.resource.data.name.size() <= 128
+        && request.resource.data.college is string && request.resource.data.college.size() <= 256;
+      allow delete: if isVerifiedOwner(userId);
+
+      // DSA Problems Subcollection
+      match /dsaProblems/{problemId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(problemId)
+          && request.resource.data.userId == userId
+          && request.resource.data.title is string && request.resource.data.title.size() <= 256;
+        allow delete: if isVerifiedOwner(userId) && isValidId(problemId);
+      }
+
+      // Tasks Subcollection
+      match /tasks/{taskId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(taskId)
+          && request.resource.data.userId == userId
+          && request.resource.data.title is string && request.resource.data.title.size() <= 256;
+        allow delete: if isVerifiedOwner(userId) && isValidId(taskId);
+      }
+
+      // Applications Subcollection
+      match /applications/{appId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(appId)
+          && request.resource.data.userId == userId
+          && request.resource.data.company is string && request.resource.data.company.size() <= 128;
+        allow delete: if isVerifiedOwner(userId) && isValidId(appId);
+      }
+
+      // Core CS Subcollection
+      match /coreCS/{subjectId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(subjectId)
+          && request.resource.data.userId == userId;
+        allow delete: if isVerifiedOwner(userId) && isValidId(subjectId);
+      }
+
+      // Mock Interviews Subcollection
+      match /mocks/{mockId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(mockId)
+          && request.resource.data.userId == userId
+          && request.resource.data.title is string && request.resource.data.title.size() <= 256;
+        allow delete: if isVerifiedOwner(userId) && isValidId(mockId);
+      }
+
+      // Checklist Subcollection
+      match /checklist/{itemId} {
+        allow get, list: if isVerifiedOwner(userId);
+        allow create, update: if isVerifiedOwner(userId) && isValidId(itemId)
+          && request.resource.data.userId == userId
+          && request.resource.data.checked is bool;
+        allow delete: if isVerifiedOwner(userId) && isValidId(itemId);
+      }
+    }
+  }
+}

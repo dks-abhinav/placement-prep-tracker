@@ -1,0 +1,151 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with student details and placement targets",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "name": { "type": "string", "maxLength": 128 },
+        "college": { "type": "string", "maxLength": 256 },
+        "branch": { "type": "string", "maxLength": 128 },
+        "year": { "type": "string", "maxLength": 64 },
+        "targetCtc": { "type": "string", "maxLength": 128 },
+        "placementDriveDate": { "type": "string", "maxLength": 32 },
+        "dailyDsaTarget": { "type": "number" },
+        "profileComplete": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email", "name", "college", "branch", "year", "targetCtc", "profileComplete"]
+    },
+    "DSAProblem": {
+      "title": "DSAProblem",
+      "description": "DSA problem tracked by student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "maxLength": 256 },
+        "topic": { "type": "string", "maxLength": 128 },
+        "difficulty": { "type": "string", "enum": ["Easy", "Medium", "Hard"] },
+        "solved": { "type": "boolean" },
+        "bookmarked": { "type": "boolean" },
+        "revisionsCount": { "type": "number" },
+        "platform": { "type": "string", "maxLength": 64 },
+        "problemUrl": { "type": "string", "maxLength": 512 },
+        "notes": { "type": "string", "maxLength": 4096 },
+        "tags": { "type": "array" }
+      },
+      "required": ["id", "userId", "code", "title", "topic", "difficulty", "solved"]
+    },
+    "PlannerTask": {
+      "title": "PlannerTask",
+      "description": "Study sprint task with due date and priority",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "category": { "type": "string", "maxLength": 64 },
+        "priority": { "type": "string", "enum": ["High", "Medium", "Low"] },
+        "dueDate": { "type": "string", "maxLength": 32 },
+        "completed": { "type": "boolean" },
+        "notes": { "type": "string", "maxLength": 2048 }
+      },
+      "required": ["id", "userId", "title", "category", "priority", "dueDate", "completed"]
+    },
+    "JobApplication": {
+      "title": "JobApplication",
+      "description": "Placement drive company application",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "company": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "maxLength": 128 },
+        "ctcLpa": { "type": "string", "maxLength": 64 },
+        "tier": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "maxLength": 64 },
+        "appliedDate": { "type": "string", "maxLength": 32 },
+        "oaOrInterviewDate": { "type": "string", "maxLength": 32 },
+        "location": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 2048 }
+      },
+      "required": ["id", "userId", "company", "role", "tier", "status", "appliedDate"]
+    },
+    "CoreCSProgress": {
+      "title": "CoreCSProgress",
+      "description": "Topic completion for core CS subjects",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "completedTopicIds": { "type": "array" }
+      },
+      "required": ["id", "userId"]
+    },
+    "MockInterview": {
+      "title": "MockInterview",
+      "description": "Mock interview session record and feedback",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "type": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 32 },
+        "interviewerOrPlatform": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "strengths": { "type": "string", "maxLength": 2048 },
+        "weaknesses": { "type": "string", "maxLength": 2048 },
+        "feedback": { "type": "string", "maxLength": 2048 },
+        "problemsAsked": { "type": "string", "maxLength": 1024 }
+      },
+      "required": ["id", "userId", "title", "type", "date", "rating"]
+    },
+    "ChecklistProgress": {
+      "title": "ChecklistProgress",
+      "description": "Checked state for ATS resume item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "checked": { "type": "boolean" }
+      },
+      "required": ["id", "userId", "checked"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Individual student profile document"
+    },
+    "/users/{userId}/dsaProblems/{problemId}": {
+      "schema": { "$ref": "#/entities/DSAProblem" },
+      "description": "Personal DSA problem records for this student"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/PlannerTask" },
+      "description": "Personal study tasks for this student"
+    },
+    "/users/{userId}/applications/{appId}": {
+      "schema": { "$ref": "#/entities/JobApplication" },
+      "description": "Personal job applications pipeline for this student"
+    },
+    "/users/{userId}/coreCS/{subjectId}": {
+      "schema": { "$ref": "#/entities/CoreCSProgress" },
+      "description": "Core CS subject completed topic tracking"
+    },
+    "/users/{userId}/mocks/{mockId}": {
+      "schema": { "$ref": "#/entities/MockInterview" },
+      "description": "Personal mock interview evaluations"
+    },
+    "/users/{userId}/checklist/{itemId}": {
+      "schema": { "$ref": "#/entities/ChecklistProgress" },
+      "description": "Personal resume checklist progress"
+    }
+  }
+}

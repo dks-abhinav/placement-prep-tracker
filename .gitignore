@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Production build outputs
+build/
+dist/
+
+# Test coverage & runner caches
+coverage/
+.vitest/
+
+# Environment files (Ensure .env is strictly excluded, .env.example is tracked)
+.env
+.env.local
+.env.*.local
+.env*
+!.env.example
+
+# Logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Extraneous lockfiles
+bun.lock

@@ -1,0 +1,6 @@
+{
+  "name": "Placement Prep Tracker",
+  "description": "Comprehensive campus placement preparation tracker for B.Tech CSE students, featuring DSA problem sheets, core CS subjects, study planner, company application pipeline, mock interviews, and ATS resume checklist.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
